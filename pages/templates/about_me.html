@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!--{% extends "base.html" %} -->
+
+
+<html>
+<!--{% block page_content %} -->
+{% load static %}
+<head>
+    <title>{{ profile.name }}</title>
+    <link href="{% static 'about_me_style.css' %}" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+    <div>
+        <h1 class="title">{{ profile.name }}</h1>
+        <p>{{ profile.address }}; {{ profile.email }}</p>
+        <table id="links">
+            <tr>
+                            {%   for  l in  links  %}
+                <td class="link_table">
+                    <a href="{{ l.url }}">{{ l.description }}</a>
+                </td>
+                {% endfor %}
+            </tr>
+        </table>
+        <table id="main">
+            <tr>
+                <td class="col1">Profile</td>
+                <td class="col2">{{ profile.description }}</td>
+            </tr>
+            <tr>
+                <td class="col1">Skills</td>
+                <td class="col2">
+                    <ul>
+                        {% for skill in skills %}
+                        <li>{{ skill.description|safe }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td class="col1">Accomplishments</td>
+                <td class="col2">
+                    <ul>
+                        {% for acc in accomplishments %}
+                            {% if acc.url == "" %}
+                                <li>{{ acc.description }}</li>
+                            {% else %}
+                                <li><a href="{{ acc.url }}">{{ acc.description }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td class="col1">Education</td>
+                <td class="col2">
+                    {% for e in education %}
+                    <table class="employment_education">
+
+                        <tr>
+                            <td class="header">{{ e.school }}</td>
+                        </tr>
+                        <tr>
+                            <td class="details">{{ e.duration }}
+                            <ul>
+                                    {% for d in e.edudets.all %}
+                                            <li class="details">{{ d.details }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+
+
+                    </table>
+                    {% endfor %}
+
+                </td>
+
+            </tr>
+            <tr>
+                <td class="col1">Employment History</td>
+                <td class="col2">
+                    {% for  e in  employment %}
+                    <table class="employment_education">
+                        <tr>
+                            <td class="header">{{ e.title.name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="details">{{ e.duration }}, {{e.company.name}}, {{ e.location.name }}
+                                                                                <ul>
+                                    {% for  d in  e.empldets.all %}
+                                    <li   class ="details">{{ d.details }}</li>
+                                                                        {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    </table>
+                                    {%   endfor %}
+
+            <tr>
+                <td class="col1">Hobby</td>
+                <td class="col2">
+
+                    <a href="{% url 'pool' %}">
+                        <img href="{% url 'links' %}" src="{% static 'balls/pool.png' %}">
+                    </a>
+                </td>
+
+            </tr>
+        </table>
+    </div>
+
+
+
+</body>
+<!-- {% endblock page_content %} -->
+</html>
+<!-- Some things to note:
+1) The indenting makes no difference to the meaning of the code above - it makes it easier to read and know what elements fall under which other elements, i.e. if a paragraph relates to heading 1 or 2.
+	
+2) The opening and closing of tags, and how they are nested correctly.
+	
+3) The basic elements - p, h(number 1-6), b, em -->
