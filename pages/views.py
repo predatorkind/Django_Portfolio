@@ -27,3 +27,6 @@ def about_me(request):
 
 def links(request):
     return render(request, "links.html")
+
+
+
