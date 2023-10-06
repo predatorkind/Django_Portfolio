@@ -87,14 +87,19 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
+    'resume': {
+            'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'resume_db.sqlite3'
+    },
     'journey_planner': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'jp_db.sqlite3'
-    }
+    },
 }
 
 DATABASE_ROUTERS = [
-    "journey_planner.router.JPRouter"
+    "personal_portfolio.router.JPRouter",
+    "personal_portfolio.router.ResumeRouter",
 ]
 
 
