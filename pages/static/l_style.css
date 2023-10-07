@@ -6,7 +6,7 @@ body {
 }
 div {
     margin: 1vh;
-    margin-top: 1vh;
+    margin-top: 10vh;
 
 }
 .row {
@@ -31,10 +31,6 @@ img {
 .container:hover img {
 
     opacity: 1;
-}
-
-.main{
-    margin-top: 10vh;
 }
 
 .frame {

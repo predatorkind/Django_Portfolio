@@ -2,7 +2,8 @@ import pages.models
 import journey_planner.models
 
 class JPRouter:
-    jp_models = pages.models.get_models()
+    jp_models = journey_planner.models.get_models()
+
     jp_db = 'journey_planner'
 
 
@@ -31,7 +32,7 @@ class JPRouter:
 
 
 class ResumeRouter:
-    resume_models = resume.models.get_models()
+    resume_models = pages.models.get_models()
     resume_db = 'resume'
 
 

@@ -7,6 +7,6 @@ class Journey(models.Model):
 
 def get_models():
     return [
-            Journey,
+            'journey',
 
     ]

@@ -56,15 +56,15 @@ class ProfileDetails(models.Model):
 
 
 def get_models():
-    return [Skill,
-            ProfileDetails,
-            Link,
-            Location,
-            Education_Detail,
-            Employment_Details,
-            Employment,
-            Accomplishment,
-                            Education,
-            Job_Title,
-            Company,
+    return ['skill',
+            'profiledetails',
+            'link',
+            'location',
+            'education_detail',
+            'employment_details',
+            'employment',
+            'accomplishment',
+            'education',
+            'job_title',
+            'company',
             ]
