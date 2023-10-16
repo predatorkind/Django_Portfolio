@@ -1,17 +1,134 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <div>
-        Journey List
+{% extends "base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <h3 class="d-flex justify-content-md-center">Your Journeys</h3>
+</div>
+            <div class="row justify-content-center">
+        <div class="col-md-8">
+{% for j in journeys %}
+            <div class="py-1">
+                <div class="row border border-dark">
+                    <div class="row d-flex align-items-center py-2">
+                    <div class="col-1 p-1">
+                        <img src="{% static 'balls/globe.png' %}" width="30" height="30">
+                    </div>
+
+                    <div class="col p-2">
+                        {{  j.name }}
+                    </div>
+                <div class="col-3 p-1 ">
+                    {{ j.start_date|date:"d-m-Y H:i" }}
+                </div>
+                <div class="d-flex col-3 dropdown justify-content-end ">
+                    <button class="btn border dropdown-toggle" type="button" id="options" data-bs-toggle="dropdown" aria-expanded="false">
+                        Options
+                    </button>
+                        <ul class="dropdown-menu" aria-labelledby="options">
+                            <li>
+                                <form class="dropdown-item" action="/view_journey" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden"  name="journey_id" value="{{ j.pk }}">
+                                    <input type="submit" class="submit_btn btn lable-success" value="View">
+                                </form>
+                            </li>
+                            <li>
+                                <form class="dropdown-item" action="/edit_journey" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden"  name="journey_id" value="{{ j.pk }}">
+                                    <input type="submit" class="submit_btn btn lable-success" value="Edit">
+                                </form>
+                            </li>
+                            <li>
+                                    <div class="dropdown-item">
+                                        <button class="submit_btn btn " data-bs-toggle="collapse" data-bs-target="#element{{ j.id }}" aria-expanded="false" aria-controls="element{{ j.id }}">
+                                            Expand
+                                        </button>
+                                    </div>
+                            </li>
+                        </ul>
+                </div>
+            </div>
+                    <div class="row px-4 pt-4 pb-2 collapse"  id="element{{ j.id }}">
+                        <div class="col">
+
+                                    {% for  key, values in names.items %}
+                            {% for  v in values %}
+                            {% if key == j.id %}
+                            {{ v }}   |
+                            {% endif %}
+                            {% endfor %}
+{% endfor %}
+                    </div>
+<div class="col">
+                        <form  class="row" action="/journey_planner" method="post">
+                                    {% csrf_token %}
+                                                <input class="col" type="text"   name="extra_user">
+                                    <input class="col-3"type="hidden"  name="journey_id" value="{{ j.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="Add User">
+                                </form>
+                    </div>
+
+                </div>
+                </div>
+
+
+</div>
+
+
+
+            {% endfor %}
+            <div class="py-3">
+                <div class="row ">
+<div class="col ">
+<form class="" action="/edit_journey" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden"  name="journey_id" value="0">
+    <input type="hidden" name="save_data" value="false">
+                <input type="hidden" name="delete_data" value="false">
+    <div  class="d-grid gap-2">
+
+        <input type="submit" class="submit_btn btn border border-dark" value="Create New">
+
+    </div>
+                                     </form>
+</div>
+                </div>
+
+            </div>
+        </div>
+                </div>
+        </div>
 <div>
-    {% for j in journeys %}
-        {{  j.description }}
+    {% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
     {% endfor %}
+</ul>
+{% endif %}
 </div>
-</body>
-</html>
+{% endblock %}

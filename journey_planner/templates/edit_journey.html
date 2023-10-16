@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-md-center">
+        <h3 class="d-flex justify-content-md-center">{{ journey.name }}</h3>
+</div>
+            <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="POST">
+                {% csrf_token %}
+                <!--{{ form|crispy }}-->
+                <div class="form-row">
+                    <div class="form-group col">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        {{ form.description|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between form-row">
+                    <div class="form-group col-5">
+                        {{ form.start_date|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-5">
+{{ form.end_date|as_crispy_field }}
+                    </div>
+                </div>
+
+                <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                <input type="hidden" name="save_data" value="true">
+                <input type="hidden" name="delete_data" value="false">
+                <div class="d-grid gap-2">
+                    <button class="btn border border-dark" type="submit">Save</button>
+                </div>
+
+            </form>
+
+
+        </div>
+            </div>
+
+                <div class="row justify-content-center">
+                <div class="col-md-8 mt-5 dropdown text-center">
+                    <button class="btn border dropdown-toggle" type="button" id="options" data-bs-toggle="dropdown" aria-expanded="false">
+                        Options
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="options">
+                            <li>
+                                <form method="POST" action="/edit_journey" class="dropdown-item">
+                                    {% csrf_token %}
+                        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                <input type="hidden" name="save_data" value="false">
+                <input type="hidden" name="delete_data" value="true">
+                        <input type="submit" class="submit_btn btn lable-success" value="Delete">
+
+
+
+
+                    </form>
+                            </li>
+                    </ul>
+
+                </div>
+                </div>
+
+        </div>
+
+{% endblock %}

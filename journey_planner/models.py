@@ -4,13 +4,12 @@ from django.db import models
 class Journey(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
-    user_id = models.IntegerField()
     start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=True, null=True)
     is_current = models.BooleanField(default=False)
 
 
-class Journey_Point:
+class Journey_Point(models.Model):
     journey_id = models.ForeignKey(Journey, on_delete=models.CASCADE, name='points')
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=300)
@@ -24,8 +23,8 @@ class Journey_Point:
     is_selected = models.BooleanField(default=False)
 
 
-class User_Journey:
-    journey_id = models.ForeignKey(Journey, on_delete=models.CASCADE, name='users')
+class User_Journey(models.Model):
+    journey_id = models.ForeignKey(Journey, on_delete=models.CASCADE)
     user_id = models.IntegerField()
 
 
