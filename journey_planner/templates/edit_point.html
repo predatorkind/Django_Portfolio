@@ -32,7 +32,27 @@
 {{ form.end_date|as_crispy_field }}
                     </div>
                 </div>
-
+                <div class="form-row">
+                    <div class="form-group col">
+                        {{ form.address|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        {{ form.cost|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        {{ form.place_url|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        {{ form.maps_url|as_crispy_field }}
+                    </div>
+                </div>
+<input type="hidden"  name="point_id" value="{{ point.pk }}">
                 <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
                 <input type="hidden" name="save_data" value="true">
                 <input type="hidden" name="delete_data" value="false">
@@ -53,9 +73,10 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="options">
                             <li>
-                                <form method="POST" action="/edit_journey" class="dropdown-item">
+                                <form method="POST" action="/edit_point" class="dropdown-item">
                                     {% csrf_token %}
                         <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ point.pk }}">
                 <input type="hidden" name="save_data" value="false">
                 <input type="hidden" name="delete_data" value="true">
                         <input type="submit" class="submit_btn btn lable-success" value="Delete">

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from journey_planner.models import Journey, User_Journey
-from .forms import NewUserForm, EditJourneyForm
+from journey_planner.models import Journey, User_Journey, Journey_Point
+from .forms import NewUserForm, EditJourneyForm, EditPointForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -11,18 +11,38 @@ from typing import List
 
 def get_dates_list(journey: Journey) -> List:
     dates=[]
-    if journey.end_date > journey.start_date:
-        td = journey.end_date - journey.start_date
-        num_days =  td.days
-        print(f"the trip is {num_days} long.")
-        date = journey.start_date.date()
-        for d in range(num_days + 1):
-            dates.append(date)
-            date = date + timedelta(days=1)
-        print(dates)
+    if journey:
+            td = journey.end_date - journey.start_date
+            print(f"Time delta: {td} / {td.days} days.")
+            num_days =  td.days + 1
+            if td.days < 1 and journey.start_date.date() != journey.end_date.date():
+                num_days += 1
+            print(f"the trip is {num_days} long.")
+            date = journey.start_date.date()
+            for d in range(num_days):
+                dates.append(date)
+                date = date + timedelta(days=1)
+            print(dates)
 
     return dates
 
+
+def get_assigned_points(journey: Journey) -> List:
+    points = []
+    if journey:
+        for p in journey.journey_point_set.all().order_by("start_date"):
+            if p.is_selected:
+                points.append(p)
+    return points
+
+
+def get_unassigned_points(journey: Journey) -> List:
+    points = []
+    if journey:
+        for p in journey.journey_point_set.all().order_by("start_date"):
+            if not p.is_selected:
+                points.append(p)
+    return  points
 
 def login_request(request):
     if request.method == "POST":
@@ -104,15 +124,61 @@ def journey_planner(request):
 def view_journey(request):
     if request.user.is_authenticated:
         journey_id = request.POST.get("journey_id")
+        assign_id = request.POST.get("assign_point")
+        unassign_id = request.POST.get("unassign_point")
+        plus_date_id = request.POST.get("plus_date")
+        minus_date_id = request.POST.get("minus_date")
 
         journey = Journey.objects.filter(id=journey_id).first()
         dates = get_dates_list(journey)
-        for p in journey.journey_point_set.all():
-            print(p)
+
+        print(f"Journey object in view journey: {journey}")
+
+        if assign_id and assign_id != "0":
+
+            point = Journey_Point.objects.filter(id=assign_id).first()
+            if point:
+                if point.start_date >= journey.start_date and point.start_date <= journey.end_date:
+                    point.is_selected = True
+                    point.save()
+                else:
+                    messages.error(request, "Journey point start date is outside the journey schedule!")
+        if unassign_id and unassign_id != "0":
+
+            point = Journey_Point.objects.filter(id=unassign_id).first()
+            if point:
+                point.is_selected = False
+                point.save()
+        if plus_date_id and plus_date_id != "0":
+            point = Journey_Point.objects.filter(id=plus_date_id).first()
+            if point:
+                if point.start_date.strftime("%d-%m-%Y") == request.POST.get("p_date"):
+                    dat = point.start_date + timedelta(days=1)
+                    if dat.date() <= journey.end_date.date():
+                        point.start_date = point.start_date + timedelta(days=1)
+                        point.end_date = point.end_date + timedelta(days=1)
+                        point.save()
+        if minus_date_id and minus_date_id != "0":
+            point = Journey_Point.objects.filter(id=minus_date_id).first()
+            if point:
+                if point.start_date.strftime("%d-%m-%Y") == request.POST.get("p_date"):
+                    if point.start_date - timedelta(days=1) > journey.start_date:
+                        point.start_date = point.start_date - timedelta(days=1)
+                        point.end_date = point.end_date - timedelta(days=1)
+                        point.save()
+
+
+
+
+
 
         context = {
             'journey': journey,
+
             'dates': dates,
+            'assigned': get_assigned_points(journey),
+            'unassigned': get_unassigned_points(journey),
+
 
         }
 
@@ -148,7 +214,7 @@ def edit_journey(request):
         else:
 
             if journey_id == "0":
-                journey = Journey(name="New Journey", start_date=datetime.now())
+                journey = Journey(name="New Journey", start_date=datetime.now().replace(hour=0,minute=0,second=0,microsecond=0), end_date=datetime.now().replace(hour=23,minute=59, second=0))
                 journey.save()
                 user_journey = User_Journey(user_id=request.user.pk,journey_id=journey)
 
@@ -170,3 +236,92 @@ def edit_journey(request):
         return redirect("login")
 
     return render(request, "edit_journey.html", context)
+
+
+def edit_point(request):
+    if request.user.is_authenticated:
+
+        journey_id = request.POST.get("journey_id")
+        print(f"Journey ID: X{journey_id}X)")
+        point_id = request.POST.get("point_id")
+        save_data = request.POST.get("save_data")
+        delete_data = request.POST.get("delete_data")
+
+        journey = Journey.objects.filter(id=journey_id).first()
+        dates = get_dates_list(journey)
+
+
+        if delete_data == "true":
+            point = Journey_Point.objects.filter(id=point_id).first()
+            if point:
+                point.delete()
+
+            ctx = {
+                "journey": journey,
+                "dates": dates,
+                                "assign_id": 0,
+                "unassign_id": 0,
+                "plus_date_id": 0,
+                "minus_date_id": 0,
+                "assigned": get_assigned_points(journey),
+                "unassigned": get_unassigned_points(journey)
+
+            }
+            return render(request,"view_journey.html", ctx)
+        elif save_data == "true":
+            point = Journey_Point.objects.filter(id=point_id).first()
+            f = EditPointForm(request.POST, instance=point)
+            if f.is_valid():
+                f.save()
+                ctx = {
+                    "journey": journey,
+                    "dates": dates,
+                    "assign_id": 0,
+                    "unassign_id": 0,
+                    "plus_date_id": 0,
+                    "minus_date_id": 0,
+                    "assigned": get_assigned_points(journey),
+                    "unassigned": get_unassigned_points(journey),
+
+                }
+                return render(request, "view_journey.html", ctx)
+            else:
+                messages.error(request, "Some data provided are incorrect.")
+                ctx = {
+                    "journey": journey,
+                    "point": point,
+                    "form": f,
+                }
+                return  render(request, "edit_point.html", ctx)
+        else:
+
+            if point_id == "0":
+                year = journey.start_date.year
+                month = journey.start_date.month
+                day = journey.start_date.day
+                point = Journey_Point (name="New Point", start_date=datetime(year=year,month=month, day=day),
+                                       end_date=datetime(year=year,month=month, day=day), journey_id=journey)
+                print("before save")
+                point.save()
+
+            else:
+
+                point = Journey_Point.objects.filter(id=point_id).first()
+
+            form = EditPointForm(instance=point)
+            print(point)
+            print(journey)
+            context = {
+            'journey': journey,
+                'point': point,
+            'form': form,
+
+        }
+
+    else:
+        messages.error(request, "You need to log in to use the Journey Planner.")
+
+        return redirect("login")
+    return render(request, "edit_point.html", context)
+
+

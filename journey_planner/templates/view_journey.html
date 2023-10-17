@@ -6,10 +6,10 @@
 {% block content %}
 
 <div class="container">
-    <div class="row justify-content-md-center">
-        <h3 class="d-flex justify-content-md-center">
+    <div class="row justify-content-center">
+        <h3 class="d-flex justify-content-center">
             {{ journey.name }}        </h3>
-        <h5 class="d-flex justify-content-md-center">
+        <h5 class="d-flex justify-content-center">
             {{ journey.start_date|date:"d-m-Y" }}
             {% if  journey.end_date %}
             - {{ journey.end_date|date:"d-m-Y" }}
@@ -17,27 +17,173 @@
         </h5>
 </div>
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-12">
     {% for  d in dates %}
     <div class="p-1">
-        <div class="row border border-dark ">
-        <div class="col-md-8">
-{{ d|date:"d-m-Y" }}
+        <div class="row border border-dark d-flex  justify-content-between">
+        <div class="col p-2" >
+{{ d|date:"d-M" }}
         </div>
+
+            <div class="col-10">
+                {% for  p in assigned %}
+                {% if  d == p.start_date.date %}
+                <div class="row py-2">
+                    <div class="col-3" data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
+                        {{ p.start_date|date:"H:i" }} -  {{ p.end_date|date:"H:i" }}
+                    </div>
+                    <div class="col-5 " data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
+                        {{ p.name }}
+                    </div>
+                    <div class="col-4  d-flex flex-wrap justify-content-end ">
+
+        <form  action="/view_journey" method="post">
+                                    {% csrf_token %}
+            <input type="hidden" name="plus_date" value="0">
+            <input type="hidden" name="minus_date" value="{{ p.pk }}">
+            <input type="hidden" name="p_date" value="{{ p.start_date|date:'d-m-Y' }}">
+            <input type="hidden"  name="assign_point" value=0>
+                                    <input type="hidden"  name="unassign_point" value="0">
+            <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&uarr;">
+                                </form>
+
+        <form  action="/view_journey" method="post">
+                                    {% csrf_token %}
+            <input type="hidden" name="plus_date" value="{{ p.pk }}">
+            <input type="hidden" name="minus_date" value="0">
+            <input type="hidden" name="p_date" value="{{ p.start_date|date:'d-m-Y' }}">
+            <input type="hidden"  name="assign_point" value=0>
+                                    <input type="hidden"  name="unassign_point" value="0">
+            <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&darr;">
+                                </form>
+
+        <form  action="/view_journey" method="post">
+                                    {% csrf_token %}
+            <input type="hidden" name="plus_date" value="0">
+            <input type="hidden" name="minus_date" value="0">
+            <input type="hidden"  name="assign_point" value=0>
+                                    <input type="hidden"  name="unassign_point" value="{{ p.pk }}">
+            <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#8650;">
+                                </form>
+
+    <form  action="/edit_point" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="save_data" value="false">
+                <input type="hidden" name="delete_data" value="false">
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#9998;">
+                                </form>
+
+
+
+                    </div>
+                </div>
+                <div class="row border-bottom pt-4 pb-2 collapse"  id="mainelement{{ p.id }}">
+                        <div class="col-12">
+<div class="py-1">
+    {{ p.description }}
+</div>
+                            <div class="py-1">
+    {{ p.address }}
+</div>
+<div class="py-1">
+    Cost: {{ p.cost }}
+</div>
+
+                            <div class="py-1">
+    Link: <a href="{{ p.place_url }}" target="_blank">{{ p.place_url }}</a>
+</div>
+                            <div class="py-1">
+    Map: <a href="{{ p.maps_url }}" target="_blank">{{ p.maps_url }}</a>
+</div>
+                    </div>
+
+
+                </div>
+
+                {% endif %}
+                {% endfor %}
+            </div>
                 </div>
     </div>
             {% endfor %}
             <hr class="hr">
-            <h5 class="d-flex justify-content-md-center">
+            <h5 class="d-flex justify-content-center">
                 Journey Points
             </h5>
-            {% for  p  in journey.journey_point_set.all %}
+            {% for  p  in unassigned %}
             <div class="p-1">
-        <div class="row border border-dark ">
-        <div class="col-md-8">
+                <div class="row border border-dark">
+                    <div class="col-12">
+        <div class="row border py-2 d-flex justify-content-between">
+        <div class="col-4 " data-bs-toggle="collapse" data-bs-target="#element{{ p.id }}" aria-expanded="false" aria-controls="element{{ p.id }}">
 {{ p.name }}
         </div>
+            <div class="col-5 ">
+                <div class="row">{{ p.start_date|date:"d-M H:i" }}</div>
+                <div class="row">{{ p.end_date|date:"d-M H:i" }}</div>
+
+
+        </div>
+            <div class="col-3 d-flex justify-content-end align-items-center" >
+
+
+<div >
+        <form  class="" action="/view_journey" method="post">
+                                    {% csrf_token %}
+            <input type="hidden"  name="assign_point" value="{{ p.pk }}">
+            <input type="hidden" name="plus_date" value="0">
+            <input type="hidden" name="minus_date" value="0">
+
+                                    <input type="hidden"  name="unassign_point" value="0">
+            <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#8648;">
+                                </form>
+    </div>
+<div >
+    <form  class="" action="/edit_point" method="post">
+                                    {% csrf_token %}
+        <input type="hidden" name="save_data" value="false">
+                <input type="hidden" name="delete_data" value="false">
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#9998;">
+                                </form>
+</div>
+
+            </div>
+
+
                 </div>
+<div class="row  pt-4 pb-2 collapse"  id="element{{ p.id }}">
+                        <div class="col-12">
+<div class="py-1">
+    {{ p.description }}
+</div>
+                            <div class="py-1">
+    {{ p.address }}
+</div>
+<div class="py-1">
+    Cost: {{ p.cost }}
+</div>
+
+                            <div class="py-1">
+    Link: <a href="{{ p.place_url }}" target="_blank">{{ p.place_url }}</a>
+</div>
+                            <div class="py-1">
+    Map: <a href="{{ p.maps_url }}" target="_blank">{{ p.maps_url }}</a>
+</div>
+
+                    </div>
+
+
+                </div>
+                    </div>
+                    </div>
     </div>
 
             {% endfor %}
@@ -47,6 +193,7 @@
 <form class="" action="/edit_point" method="post">
                                     {% csrf_token %}
                                     <input type="hidden"  name="point_id" value="0">
+    <input type="hidden" name="journey_id" value="{{ journey.pk }}">
     <input type="hidden" name="save_data" value="false">
                 <input type="hidden" name="delete_data" value="false">
     <div  class="d-grid gap-2">
@@ -65,5 +212,14 @@
     </div>
 
         </div>
+<div>
+    {% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+</div>
 
 {% endblock %}

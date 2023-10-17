@@ -3,18 +3,18 @@ from django.db import models
 # Create your models here.
 class Journey(models.Model):
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=300)
+    description = models.CharField(max_length=300, blank=True)
     start_date = models.DateTimeField(blank=False)
-    end_date = models.DateTimeField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=False)
     is_current = models.BooleanField(default=False)
 
 
 class Journey_Point(models.Model):
-    journey_id = models.ForeignKey(Journey, on_delete=models.CASCADE, name='points')
+    journey_id = models.ForeignKey(Journey, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    description = models.CharField(max_length=300)
+    description = models.CharField(max_length=300,blank=True)
     start_date = models.DateTimeField(blank=False)
-    end_date =models.DateTimeField(blank=True, null=True)
+    end_date =models.DateTimeField(blank=False)
     cost = models.FloatField(default=0.00)
     location = models.CharField(max_length=200, blank=True)
     address = models.CharField(max_length=200, blank=True)
