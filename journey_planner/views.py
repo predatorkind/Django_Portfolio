@@ -44,6 +44,19 @@ def get_unassigned_points(journey: Journey) -> List:
                 points.append(p)
     return  points
 
+
+def get_total_cost(journey: Journey) -> str:
+    if journey:
+        cost = 0.0
+        for p in journey.journey_point_set.all():
+            if p.is_selected:
+                cost += p.cost
+    total = f"{cost:.2f}"
+    print(total)
+    return total
+
+
+
 def login_request(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -103,11 +116,13 @@ def journey_planner(request):
         names = {}
         for j in journeys:
             for u in j.user_journey_set.all():
-                username = User.objects.get(id=u.user_id).username
-                if j.id in names:
-                    names[j.id].append(username)
-                else:
-                    names[j.id] = [username]
+                usr = User.objects.filter(id=u.user_id).first()
+                if usr:
+                    username = User.objects.get(id=u.user_id).username
+                    if j.id in names:
+                        names[j.id].append(username)
+                    else:
+                        names[j.id] = [username]
 
         context = {
             'journeys': journeys,
@@ -174,11 +189,10 @@ def view_journey(request):
 
         context = {
             'journey': journey,
-
+'cost': get_total_cost(journey),
             'dates': dates,
             'assigned': get_assigned_points(journey),
             'unassigned': get_unassigned_points(journey),
-
 
         }
 
@@ -259,6 +273,7 @@ def edit_point(request):
             ctx = {
                 "journey": journey,
                 "dates": dates,
+                "cost": get_total_cost(journey),
                                 "assign_id": 0,
                 "unassign_id": 0,
                 "plus_date_id": 0,
@@ -276,6 +291,7 @@ def edit_point(request):
                 ctx = {
                     "journey": journey,
                     "dates": dates,
+                    "cost": get_total_cost(journey),
                     "assign_id": 0,
                     "unassign_id": 0,
                     "plus_date_id": 0,
