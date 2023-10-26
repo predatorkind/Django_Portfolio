@@ -6,7 +6,16 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Tuple
+import googlemaps
+import json
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+import ssl
+import urllib.request
+import urllib.parse
+import urllib.error
 
 
 def get_dates_list(journey: Journey) -> List:
@@ -55,6 +64,45 @@ def get_total_cost(journey: Journey) -> str:
     print(total)
     return total
 
+
+def get_location(address: str) -> Tuple:
+    geocode_url = "https://maps.googleapis.com/maps/api/geocode/json?"
+    api_key = settings.MAPS_API_KEY
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+
+    params = dict()
+    params['address'] = address
+    params['key'] = api_key
+
+    url = geocode_url + urllib.parse.urlencode(params)
+
+    uhandle = urllib.request.urlopen(url, context=ctx)
+    data = uhandle.read().decode()
+
+    # print("Retrieved", len(data), "characters.")
+
+    try:
+        js = json.loads(data)
+
+    except:
+        js = None
+
+    if not js or "status" not in js or js["status"] != "OK":
+        print("Failed to retrieve data.")
+
+        return 0, 0, ""
+
+    else:
+
+        # print(json.dumps(js, indent=4))
+
+        lat = js["results"][0]["geometry"]["location"]["lat"]
+        lng = js["results"][0]["geometry"]["location"]["lng"]
+        name = js["results"][0]["formatted_address"]
+
+        return lat, lng, name
 
 
 def login_request(request):
@@ -339,5 +387,64 @@ def edit_point(request):
 
         return redirect("login")
     return render(request, "edit_point.html", context)
+
+@ensure_csrf_cookie
+def map_search(request):
+    key = settings.MAPS_API_KEY
+    if request.user.is_authenticated:
+        journey_id = request.POST.get("journey_id")
+        point_id = request.POST.get("point_id")
+        save_data = request.POST.get("save_data")
+        find_address = request.POST.get("find_address")
+        lat = 0
+        lng = 0
+
+        if journey_id and journey_id != "0":
+            journey = Journey.objects.filter(id=journey_id).first()
+            if journey.location != "":
+                lat, lng = journey.location.split("/")
+            address = journey.name
+
+        if point_id and point_id != "0":
+            point = Journey_Point.objects.filter(id=point_id).first()
+            if point.location != "":
+                lat, lng = point.location.split("/")
+            address = point.address
+
+
+        print(lat, lng)
+        print(address)
+
+        context = {
+            'journey': journey,
+            'point': point,
+            'key': key,
+            'lat': lat,
+            'lng': lng,
+            'address': address,
+
+        }
+
+    else:
+        messages.error(request, "You need to log in to use the Journey Planner.")
+        return redirect("login")
+
+    return render(request, 'map_search.html', context)
+
+
+def loc_data(request):
+    print(request.POST)
+    lat, lng, addr = get_location(request.POST.get('address'))
+
+    if request.POST.get('save') == 'true':
+        print("saving")
+        point = Journey_Point.objects.filter(id=request.POST.get('point')).first()
+        if point:
+            point.address = addr
+            point.location = str(lat) + "/" + str(lng)
+            point.save()
+
+    resultlist = {'lat':lat, 'lng': lng, 'address': addr}
+    return JsonResponse(resultlist, safe=False)
 
 

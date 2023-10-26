@@ -7,6 +7,7 @@ class Journey(models.Model):
     start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=False)
     is_current = models.BooleanField(default=False)
+    location = models.CharField(blank=True, max_length=30)
 
 
 class Journey_Point(models.Model):
@@ -21,6 +22,7 @@ class Journey_Point(models.Model):
     maps_url = models.URLField(max_length=300, blank=True)
     place_url = models.URLField(max_length=300, blank=True)
     is_selected = models.BooleanField(default=False)
+
 
 
 class User_Journey(models.Model):

@@ -80,6 +80,15 @@
                                     <input type="hidden"  name="point_id" value="{{ p.pk }}">
                                     <input type="submit" class="submit_btn btn col border border-dark" value="&#9998;">
                                 </form>
+                        <form  action="/map_search" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="save_data" value="false">
+
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F30D;">
+                                </form>
+
 
 
 
@@ -157,6 +166,14 @@
                                     <input type="submit" class="submit_btn btn col border border-dark" value="&#9998;">
                                 </form>
 </div>
+                <form  action="/map_search" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="save_data" value="false">
+
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F30D;">
+                                </form>
 
             </div>
 

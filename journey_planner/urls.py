@@ -9,5 +9,8 @@ urlpatterns = [
     path('view_journey', views.view_journey, name='view_journey'),
     path('edit_journey', views.edit_journey, name='edit_journey'),
     path('edit_point',views.edit_point, name='edit_point'),
+    path('map_search', views.map_search, name='map_search'),
+    path('loc_data', views.loc_data, name='loc_data'),
+
 
                ]

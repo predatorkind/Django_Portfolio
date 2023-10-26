@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<script>
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+
+
+
+    $(document).ready(function(){
+        if(hasLocation()) {
+            initMap(getLocation())
+        } else {
+            getCords($('#address').val(), false);
+        }
+    });
+
+    function hasLocation(){
+        var loc = "{{ point.location }}"
+        if (loc == "") {
+            return false
+        } else {
+            return true
+        }
+    }
+
+
+    function getLocation(){
+        var loc = "{{ point.location }}"
+        cords = loc.split("/")
+        result = {lat: parseFloat(cords[0]), lng: parseFloat(cords[1])}
+        console.log(result)
+        return result
+    }
+
+
+
+    $(document).ready(function() {
+        $('#searchAddress').submit(function(e) {
+            e.preventDefault();
+            getCords($('#address').val(), false);
+
+        })
+
+    })
+
+    $(document).ready(function() {
+        $('#saveData').submit(function(e) {
+            e.preventDefault();
+            getCords($('#address').val(), true);
+
+        })
+
+    })
+
+
+
+
+
+    async function getCords(address, is_save){
+        var url = "{% url 'loc_data' %}"
+        var add = " "
+        if ($('#address').val() != "") {
+
+            add = $('#address').val()
+            console.log(add)
+        }
+        var data = {
+            save: is_save,
+            address: add,
+            point: {{ point.pk }},
+            journey: {{ journey.pk }},
+            csrfmiddlewaretoken: csrftoken,
+        }
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: data,
+            success: function(response) {
+                console.log(response);
+                $('#address').val(response.address);
+                initMap(response)
+
+
+            }
+        });
+
+    }
+
+
+    let map;
+    async function initMap(data) {
+        const { Map } = await google.maps.importLibrary('maps');
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+        map = new Map(document.getElementById("map"), {
+            center: { lat: data.lat, lng: data.lng },
+            zoom: 8,
+            mapId: "DEMO_MAP_ID"
+        });
+
+        const marker = new AdvancedMarkerElement({
+            map: map,
+            position: { lat: data.lat, lng: data.lng },
+            title: "marker"
+        });
+
+
+
+    };
+
+</script>
+<style>
+    .mapholder{
+    height: 70vh;
+    width: 100%;
+}
+
+#map {
+    height: 100%;
+  }
+</style>
+<div class="row justify-content-center">
+        <div class="col-12 d-flex flex-wrap justify-content-end ">
+
+    <form id="searchAddress"  action="/map_search" method="post">
+                                    {% csrf_token %}
+                                                <input    id="address" type="text"   size="35" name="find_address" value="{{ point.address }}">
+                                    <input type="hidden" name="save_data" value="false">
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F50D;">
+                                </form>
+            <form  id="saveData" action="/map_search" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="save_data" value="false">
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F4BE;">
+                                </form>
+            <form  class="" action="/map_search" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="save_data" value="false">
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#9932;">
+                                </form>
+</div>
+</div>
+<div class="row justify-content-center">
+        <div class="col-12">
+
+    <div class="linkholder">
+        <div class="mapholder">
+            <div id="map"></div>
+
+
+            <script>
+              (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+                key: "{{key}}",
+                v: "weekly",
+
+              });
+            </script>
+
+        </div>
+
+    </div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}
