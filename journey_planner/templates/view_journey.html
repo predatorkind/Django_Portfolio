@@ -9,30 +9,48 @@
     <div class="row justify-content-center">
         <h3 class="d-flex justify-content-center">
             {{ journey.name }}        </h3>
-        <h5 class="d-flex justify-content-center">
+        <row class="d-flex  justify-content-between">
+            <col-8>
+                <h5 class="d-flex ">
             {{ journey.start_date|date:"d-m-Y" }}
             {% if  journey.end_date %}
             - {{ journey.end_date|date:"d-m-Y" }}
             {% endif %}
         </h5>
-        <p class="d-flex justify-content-center">
+                <p class="d-flex ">
             Total cost: {{cost}}
         </p>
+            </col-8>
+            <col-4>
+                <form  action="/map_search" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="save_data" value="false">
+
+        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                                    <input type="hidden"  name="point_id" value="0">
+
+                                    <input  type="image"   src="{% static 'balls/globe.png' %}" width="65" height="60">
+                                </form>
+            </col-4>
+        </row>
+
+
 </div>
     <div class="row justify-content-center">
         <div class="col-12">
     {% for  d in dates %}
     <div class="p-1">
-        <div class="row border border-dark d-flex  justify-content-between">
-        <div class="col p-2" >
-{{ d|date:"d-M" }}
+        <div class="row border border-dark d-flex  justify-content-between calendar">
+        <div class="col p-2 small" >
+{{ d|date:"d-M (D)" }}
         </div>
 
-            <div class="col-10">
+            <div class="col-10 ">
                 {% for  p in assigned %}
                 {% if  d == p.start_date.date %}
-                <div class="row py-2">
-                    <div class="col-3" data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
+                <div class="row py-2 border border-dark shadow {% if p.status.id == 1 %} statDefault {% elif p.status.id == 2 %} statTodo {% else %} statDone {% endif %}">
+
+                    <div class="col-2 small " data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
                         {{ p.start_date|date:"H:i" }} -  {{ p.end_date|date:"H:i" }}
                     </div>
                     <div class="col-5 " data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
@@ -48,7 +66,7 @@
             <input type="hidden"  name="assign_point" value=0>
                                     <input type="hidden"  name="unassign_point" value="0">
             <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&uarr;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW" value="&uarr;">
                                 </form>
 
         <form  action="/view_journey" method="post">
@@ -59,7 +77,7 @@
             <input type="hidden"  name="assign_point" value=0>
                                     <input type="hidden"  name="unassign_point" value="0">
             <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&darr;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW" value="&darr;">
                                 </form>
 
         <form  action="/view_journey" method="post">
@@ -69,7 +87,7 @@
             <input type="hidden"  name="assign_point" value=0>
                                     <input type="hidden"  name="unassign_point" value="{{ p.pk }}">
             <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#8650;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW" value="&#8650;">
                                 </form>
 
     <form  action="/edit_point" method="post">
@@ -78,7 +96,7 @@
                 <input type="hidden" name="delete_data" value="false">
         <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
                                     <input type="hidden"  name="point_id" value="{{ p.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#9998;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW" value="&#9998;">
                                 </form>
                         <form  action="/map_search" method="post">
                                     {% csrf_token %}
@@ -86,7 +104,7 @@
 
         <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
                                     <input type="hidden"  name="point_id" value="{{ p.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F30D;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW ps-2 "  value="&#x1F30D;">
                                 </form>
 
 
@@ -94,7 +112,7 @@
 
                     </div>
                 </div>
-                <div class="row border-bottom pt-4 pb-2 collapse"  id="mainelement{{ p.id }}">
+                <div class="row border border-dark  pt-4 pb-2 collapse {% if p.status.id == 1 %} statDefault {% elif p.status.id == 2 %} statTodo {% else %} statDone {% endif %}"  id="mainelement{{ p.id }}">
                         <div class="col-12">
 <div class="py-1">
     {{ p.description }}
@@ -131,7 +149,7 @@
             <div class="p-1">
                 <div class="row border border-dark">
                     <div class="col-12">
-        <div class="row border py-2 d-flex justify-content-between">
+        <div class="row border border-dark py-2 d-flex justify-content-between shadow statDefault">
         <div class="col-4 " data-bs-toggle="collapse" data-bs-target="#element{{ p.id }}" aria-expanded="false" aria-controls="element{{ p.id }}">
 {{ p.name }}
         </div>
@@ -153,7 +171,7 @@
 
                                     <input type="hidden"  name="unassign_point" value="0">
             <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#8648;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW" value="&#8648;">
                                 </form>
     </div>
 <div >
@@ -163,23 +181,24 @@
                 <input type="hidden" name="delete_data" value="false">
         <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
                                     <input type="hidden"  name="point_id" value="{{ p.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#9998;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW" value="&#9998;">
                                 </form>
 </div>
+
                 <form  action="/map_search" method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="save_data" value="false">
 
         <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
                                     <input type="hidden"  name="point_id" value="{{ p.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F30D;">
+                                    <input type="submit" class="submit_btn btn col border border-dark butW ps-2" value="&#x1F30D;">
                                 </form>
 
             </div>
 
 
                 </div>
-<div class="row  pt-4 pb-2 collapse"  id="element{{ p.id }}">
+<div class="row  pt-4 pb-2 collapse statDefault"  id="element{{ p.id }}">
                         <div class="col-12">
 <div class="py-1">
     {{ p.description }}
@@ -218,7 +237,7 @@
                 <input type="hidden" name="delete_data" value="false">
     <div  class="d-grid gap-2">
 
-        <input type="submit" class="submit_btn btn border border-dark" value="Create New">
+        <input type="submit" class="submit_btn btn border border-dark default" value="Create New">
 
     </div>
                                      </form>

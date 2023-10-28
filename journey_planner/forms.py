@@ -75,6 +75,7 @@ class EditPointForm(forms.ModelForm):
             "id",
             "name",
             "description",
+            "status",
             "start_date",
             "end_date",
             "address",

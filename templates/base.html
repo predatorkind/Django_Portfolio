@@ -14,10 +14,66 @@
 
     {% block stylesheet %}{% endblock %}
 </head>
-<body class="container-sm">
+<style>
+    :root {
+      --blue: #1e90ff;
+      --white: #ffffff;
+      --cream: #eeeedd;
+      --black: #000000;
+      --bdrop: #6b5a4e;
+      --bgcolor: #6F5E5C;
+      --calendar: #AFA683;
+      --default: #C6CAEDBB;
+
+
+    }
+
+
+
+    .butW {
+        width: 40px;
+        background-color: var(--default);
+
+
+    }
+    .statDefault {
+        background-color: #CCCCCC66;
+        color: var(--black)
+    }
+    .statTodo {
+        background-color: #FF772266;
+    }
+    .statDone {
+        background-color: #22CC2266;
+    }
+    .point-label {
+      background-color: #822284DD;
+      border-radius: 5px;
+      border-style: solid;
+      border-color: #222222;
+      color: #FFFFFF;
+      font-size: 18px;
+      padding: 10px 15px;
+      position: relative;
+    }
+    .point-label::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translate(-50%, 0);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid #822284DD;
+
+    }
+</style>
+<body class="container-sm bdrop">
 {% block body %}
 
-    <nav class="navbar navbar-expand-sm navbar-light bg-light border border-dark shadow flex-row">
+    <nav class="navbar navbar-expand-sm navbar-light border border-dark shadow flex-row default">
 
   <div class="container-fluid ">
 
@@ -54,7 +110,7 @@
   </div>
 </nav>
 
-<div class="container">
+<div class="container bground">
     <ol class="breadcumb my-4">
         {% block breadcrumb %}
         {% endblock %}

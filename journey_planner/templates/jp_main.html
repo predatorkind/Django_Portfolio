@@ -50,12 +50,12 @@
                     <form action="/view_journey" method="post">
                                     {% csrf_token %}
                                     <input type="hidden"  name="journey_id" value="{{ j.pk }}">
-                                    <input type="submit" class="submit_btn btn col border-dark" value="&#x2630;">
+                                    <input type="submit" class="submit_btn btn col border-dark butW " value="&#x2630;">
                                 </form>
                     <form action="/edit_journey" method="post">
                                     {% csrf_token %}
                                     <input type="hidden"  name="journey_id" value="{{ j.pk }}">
-                                    <input type="submit" class="submit_btn btn col border-dark" value="&#9998;">
+                                    <input type="submit" class="submit_btn btn col border-dark butW " value="&#9998;">
                                 </form>
 
 
@@ -107,7 +107,7 @@
                 <input type="hidden" name="delete_data" value="false">
     <div  class="d-grid gap-2">
 
-        <input type="submit" class="submit_btn btn border border-dark" value="Create New">
+        <input type="submit" class="submit_btn btn border border-dark " value="Create New">
 
     </div>
                                      </form>

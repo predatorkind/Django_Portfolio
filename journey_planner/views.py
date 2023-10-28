@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from journey_planner.models import Journey, User_Journey, Journey_Point
+from journey_planner.models import Journey, User_Journey, Journey_Point, Status
 from .forms import NewUserForm, EditJourneyForm, EditPointForm
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
@@ -195,7 +195,7 @@ def view_journey(request):
         journey = Journey.objects.filter(id=journey_id).first()
         dates = get_dates_list(journey)
 
-        print(f"Journey object in view journey: {journey}")
+
 
         if assign_id and assign_id != "0":
 
@@ -225,7 +225,7 @@ def view_journey(request):
             point = Journey_Point.objects.filter(id=minus_date_id).first()
             if point:
                 if point.start_date.strftime("%d-%m-%Y") == request.POST.get("p_date"):
-                    if point.start_date - timedelta(days=1) > journey.start_date:
+                    if point.start_date - timedelta(days=1) >= journey.start_date:
                         point.start_date = point.start_date - timedelta(days=1)
                         point.end_date = point.end_date - timedelta(days=1)
                         point.save()
@@ -364,8 +364,8 @@ def edit_point(request):
                 month = journey.start_date.month
                 day = journey.start_date.day
                 point = Journey_Point (name="New Point", start_date=datetime(year=year,month=month, day=day),
-                                       end_date=datetime(year=year,month=month, day=day), journey_id=journey)
-                print("before save")
+                                       end_date=datetime(year=year,month=month, day=day), journey_id=journey, status=Status.objects.get(id=1))
+
                 point.save()
 
             else:
@@ -373,8 +373,7 @@ def edit_point(request):
                 point = Journey_Point.objects.filter(id=point_id).first()
 
             form = EditPointForm(instance=point)
-            print(point)
-            print(journey)
+
             context = {
             'journey': journey,
                 'point': point,
@@ -396,32 +395,82 @@ def map_search(request):
         point_id = request.POST.get("point_id")
         save_data = request.POST.get("save_data")
         find_address = request.POST.get("find_address")
-        lat = 0
-        lng = 0
+        clat = 0
+        clng = 0
+        map_data = {
+            "center": {
+                "lat": clat,
+                "lng": clng,
+                "address": "empty"
+            },
+            "points": []
+        }
+
 
         if journey_id and journey_id != "0":
             journey = Journey.objects.filter(id=journey_id).first()
             if journey.location != "":
-                lat, lng = journey.location.split("/")
-            address = journey.name
+                clat, clng = journey.location.split("/")
+
+            else:
+                clat, clng, addr = get_location(journey.name)
+                journey.location = str(clat) + "/" + str(clng)
+                journey.save
+                print(f"Journey after saving location: {journey.location}")
+                print(f"***Obtained location: {clat} / {clng} / {addr}")
+
+            map_data['center']['lat'] = float(clat)
+            map_data['center']['lng'] = float(clng)
+            map_data['center']['address'] = journey.name
 
         if point_id and point_id != "0":
             point = Journey_Point.objects.filter(id=point_id).first()
             if point.location != "":
                 lat, lng = point.location.split("/")
-            address = point.address
+                map_data['center']['lat'] = float(lat)
+                map_data['center']['lng'] = float(lng)
+                map_data['center']['address'] = point.address
+                map_data['points'].append({
+                    'lat': float(lat),
+                    'lng': float(lng),
+                    'address': point.address,
+                    'name': point.name,
+                })
 
 
-        print(lat, lng)
-        print(address)
+
+            point_pk = point.id
+        else:
+            point_pk = 0
+            point = 0
+            if journey:
+                for p in journey.journey_point_set.all():
+                    if p.is_selected and p.location != "":
+                        lat, lng = p.location.split("/")
+                        map_data['points'].append({
+                            'lat': float(lat),
+                            'lng':float(lng),
+                            'address': p.address,
+                            'name': p.name,
+                                                   })
+
+        print(f"Center: {map_data['center']}")
+        print(f"Points: {map_data['points']}")
+
+
+        #map_data = json.dumps(map_data)
+
+
+
+
+
 
         context = {
             'journey': journey,
             'point': point,
+            'point_pk': point_pk,
             'key': key,
-            'lat': lat,
-            'lng': lng,
-            'address': address,
+            'map_data': map_data,
 
         }
 
@@ -435,16 +484,44 @@ def map_search(request):
 def loc_data(request):
     print(request.POST)
     lat, lng, addr = get_location(request.POST.get('address'))
+    name = "Not Found"
+    if addr:
+        if len(addr) > 10:
+            name = addr[:10] + ".."
+        else:
+            name = addr[:10]
 
     if request.POST.get('save') == 'true':
-        print("saving")
+
         point = Journey_Point.objects.filter(id=request.POST.get('point')).first()
         if point:
+            print("saving: " , point)
             point.address = addr
             point.location = str(lat) + "/" + str(lng)
             point.save()
 
-    resultlist = {'lat':lat, 'lng': lng, 'address': addr}
-    return JsonResponse(resultlist, safe=False)
+        else:
+            journey = Journey.objects.filter(id=request.POST.get('journey')).first()
+            if journey:
+                print("saving: ", journey)
+                journey.location = str(lat) + "/" + str(lng)
+                journey.save()
+
+    map_data = {
+        'center': {
+            'lat': lat,
+            'lng': lng,
+            'address': addr
+        },
+        'points': [{'lat':lat, 'lng': lng, 'address': addr, 'name': name}]
+    }
+
+    return JsonResponse(map_data, safe=False)
+
+
+
+
+
+
 
 

@@ -4,6 +4,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+{{ map_data|json_script:"mapData" }}
 
 <script>
 
@@ -29,8 +30,16 @@
 
 
     $(document).ready(function(){
+        mdata = JSON.parse($("#mapData").text())
+        console.log("Map data: ", mdata);
+
+
         if(hasLocation()) {
-            initMap(getLocation())
+            console.log("Displaying Point Data", mdata);
+            initMap(mdata);
+        } else if(hasJourney()) {
+            console.log("Displaying Journey Data", mdata);
+            initMap(mdata);
         } else {
             getCords($('#address').val(), false);
         }
@@ -38,6 +47,17 @@
 
     function hasLocation(){
         var loc = "{{ point.location }}"
+        console.log("Point location: ", loc)
+        if (loc == "") {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    function hasJourney(){
+        var loc = "{{ journey.location }}"
+        console.log("Journey location: ", loc)
         if (loc == "") {
             return false
         } else {
@@ -46,10 +66,15 @@
     }
 
 
-    function getLocation(){
-        var loc = "{{ point.location }}"
-        cords = loc.split("/")
-        result = {lat: parseFloat(cords[0]), lng: parseFloat(cords[1])}
+    function getLocation(loc){
+
+        cords = loc.split("/");
+        clat = parseFloat(cords[0]);
+        clng = parseFloat(cords[1]);
+        console.log(cords);
+        result = {'center': {lat: clat, lng: clng},
+            'points':[],
+            }
         console.log(result)
         return result
     }
@@ -86,10 +111,11 @@
             add = $('#address').val()
             console.log(add)
         }
+
         var data = {
             save: is_save,
             address: add,
-            point: {{ point.pk }},
+            point: {{ point_pk }},
             journey: {{ journey.pk }},
             csrfmiddlewaretoken: csrftoken,
         }
@@ -99,7 +125,7 @@
             data: data,
             success: function(response) {
                 console.log(response);
-                $('#address').val(response.address);
+                $('#address').val(response.center.address);
                 initMap(response)
 
 
@@ -115,16 +141,24 @@
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
         map = new Map(document.getElementById("map"), {
-            center: { lat: data.lat, lng: data.lng },
-            zoom: 8,
+            center: data.center,
+            zoom: 10,
             mapId: "DEMO_MAP_ID"
         });
+        console.log(data.points)
+        data.points.forEach((p)=> {
+            const label = document.createElement("div");
+            label.className = "point-label";
+            label.textContent = p.name;
+            const marker = new AdvancedMarkerElement({
+                map: map,
+                position: { lat: p.lat, lng: p.lng },
+                title: p.name,
+                content: label,
 
-        const marker = new AdvancedMarkerElement({
-            map: map,
-            position: { lat: data.lat, lng: data.lng },
-            title: "marker"
-        });
+            });
+        })
+
 
 
 
@@ -159,7 +193,7 @@
                                     <input type="hidden"  name="point_id" value="{{ p.pk }}">
                                     <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F4BE;">
                                 </form>
-            <form  class="" action="/map_search" method="post">
+            <form  class="" action="/view_journey" method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="save_data" value="false">
         <input type="hidden"  name="journey_id" value="{{ journey.pk }}">

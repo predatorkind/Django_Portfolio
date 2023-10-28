@@ -9,6 +9,12 @@ class Journey(models.Model):
     is_current = models.BooleanField(default=False)
     location = models.CharField(blank=True, max_length=30)
 
+class Status(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return  self.name
+
 
 class Journey_Point(models.Model):
     journey_id = models.ForeignKey(Journey, on_delete=models.CASCADE)
@@ -22,7 +28,7 @@ class Journey_Point(models.Model):
     maps_url = models.URLField(max_length=300, blank=True)
     place_url = models.URLField(max_length=300, blank=True)
     is_selected = models.BooleanField(default=False)
-
+    status = models.ForeignKey(Status, on_delete=models.CASCADE)
 
 
 class User_Journey(models.Model):
@@ -30,10 +36,16 @@ class User_Journey(models.Model):
     user_id = models.IntegerField()
 
 
+
+
+
+
+
 def get_models():
     return [
             'journey',
             'journey_point',
             'user_journey',
+        'status',
 
     ]
