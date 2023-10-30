@@ -26,6 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(find_dotenv())
 SECRET_KEY = os.getenv('SECRET_KEY')
 MAPS_API_KEY = os.getenv('MAPS_API_KEY')
+GEOCODE_KEY = os.getenv('GEOCODE_KEY')
 
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SAFE = False

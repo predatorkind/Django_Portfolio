@@ -65,7 +65,7 @@ def get_total_cost(journey: Journey) -> str:
     return total
 
 
-def get_location(address: str) -> Tuple:
+def get_location_old(address: str) -> Tuple:
     geocode_url = "https://maps.googleapis.com/maps/api/geocode/json?"
     api_key = settings.MAPS_API_KEY
     ctx = ssl.create_default_context()
@@ -103,6 +103,29 @@ def get_location(address: str) -> Tuple:
         name = js["results"][0]["formatted_address"]
 
         return lat, lng, name
+
+
+def get_location(address: str) -> Tuple:
+
+    api_key = settings.GEOCODE_KEY
+    gmaps = googlemaps.Client(key=api_key)
+
+    data = gmaps.geocode(address)
+
+
+    print("Retrieved", len(data), "characters.")
+    print(data)
+
+    if len(data) > 0:
+
+        lat = data[0]["geometry"]["location"]["lat"]
+        lng = data[0]["geometry"]["location"]["lng"]
+        name = data[0]["formatted_address"]
+
+        return lat, lng, name
+
+    else:
+        return 0, 0, ""
 
 
 def login_request(request):
