@@ -40,23 +40,23 @@
         <div class="col-12">
     {% for  d in dates %}
     <div class="p-1">
-        <div class="row border border-dark d-flex  justify-content-between calendar">
-        <div class="col p-2 small" >
-{{ d|date:"d-M (D)" }}
+        <div class="row border border-dark  calendar">
+        <div class="col-2 p-1 border small" >
+{{ d|date:"d M (D)" }}
         </div>
 
             <div class="col-10 ">
                 {% for  p in assigned %}
                 {% if  d == p.start_date.date %}
-                <div class="row py-2 border border-dark shadow {% if p.status.id == 1 %} statDefault {% elif p.status.id == 2 %} statTodo {% else %} statDone {% endif %}">
+                <div class="row py-1 border border-dark shadow {% if p.status.id == 1 %} statDefault {% elif p.status.id == 2 %} statTodo {% else %} statDone {% endif %}">
 
                     <div class="col-2 small " data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
                         {{ p.start_date|date:"H:i" }} -  {{ p.end_date|date:"H:i" }}
                     </div>
-                    <div class="col-5 " data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
+                    <div class="col-6 " data-bs-toggle="collapse" data-bs-target="#mainelement{{ p.id }}" aria-expanded="false" aria-controls="mainelement{{ p.id }}">
                         {{ p.name }}
                     </div>
-                    <div class="col-4  d-flex flex-wrap justify-content-end ">
+                    <div class="col-4 d-flex flex-wrap justify-content-end px-1">
 
         <form  action="/view_journey" method="post">
                                     {% csrf_token %}
@@ -112,7 +112,7 @@
 
                     </div>
                 </div>
-                <div class="row border border-dark  pt-4 pb-2 collapse {% if p.status.id == 1 %} statDefault {% elif p.status.id == 2 %} statTodo {% else %} statDone {% endif %}"  id="mainelement{{ p.id }}">
+                <div class="row  pt-4 pb-2 collapse {% if p.status.id == 1 %} statDefault {% elif p.status.id == 2 %} statTodo {% else %} statDone {% endif %}"  id="mainelement{{ p.id }}">
                         <div class="col-12">
 <div class="py-1">
     {{ p.description }}
@@ -124,10 +124,10 @@
     Cost: {{ p.cost }}
 </div>
 
-                            <div class="py-1">
+                            <div class="py-1 text-break">
     Link: <a href="{{ p.place_url }}" target="_blank">{{ p.place_url }}</a>
 </div>
-                            <div class="py-1">
+                            <div class="py-1 text-break">
     Map: <a href="{{ p.maps_url }}" target="_blank">{{ p.maps_url }}</a>
 </div>
                     </div>
@@ -149,17 +149,18 @@
             <div class="p-1">
                 <div class="row border border-dark">
                     <div class="col-12">
-        <div class="row border border-dark py-2 d-flex justify-content-between shadow statDefault">
-        <div class="col-4 " data-bs-toggle="collapse" data-bs-target="#element{{ p.id }}" aria-expanded="false" aria-controls="element{{ p.id }}">
+        <div class="row py-1 border border-dark d-flex justify-content-between shadow statDefault">
+            <div class="col-2 small  align-self-stretch">
+                <div >{{ p.start_date|date:"d M (D)" }}</div>
+
+
+
+        </div>
+        <div class="col-6 " data-bs-toggle="collapse" data-bs-target="#element{{ p.id }}" aria-expanded="false" aria-controls="element{{ p.id }}">
 {{ p.name }}
         </div>
-            <div class="col-5 ">
-                <div class="row">{{ p.start_date|date:"d-M H:i" }}</div>
-                <div class="row">{{ p.end_date|date:"d-M H:i" }}</div>
 
-
-        </div>
-            <div class="col-3 d-flex justify-content-end align-items-center" >
+            <div class="col-3 d-flex align-self-center justify-content-end px-1" >
 
 
 <div >

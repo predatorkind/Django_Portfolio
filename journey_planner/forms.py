@@ -68,6 +68,7 @@ class EditPointForm(forms.ModelForm):
     id = models.IntegerField()
     end_date = forms.SplitDateTimeField(widget=SplitDateTimeWidget)
     start_date = forms.SplitDateTimeField(widget=SplitDateTimeWidget, required=True)
+    is_selected = forms.BooleanField(widget=forms.CheckboxInput(attrs={'style':'width:30px;height:30px;margin-top:10px;'}), label="", required=False)
 
     class Meta:
         model = Journey_Point
@@ -76,6 +77,7 @@ class EditPointForm(forms.ModelForm):
             "name",
             "description",
             "status",
+            "is_selected",
             "start_date",
             "end_date",
             "address",

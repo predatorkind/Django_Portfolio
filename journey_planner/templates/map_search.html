@@ -164,49 +164,80 @@
 
     };
 
+    function clearSearch() {
+
+        $('#address').val("");
+
+    }
+
 </script>
 <style>
     .mapholder{
-    height: 70vh;
-    width: 100%;
-}
+        height: 80vh;
+        width: 100%;
+    }
 
-#map {
-    height: 100%;
-  }
+    #map {
+        height: 100%;
+    }
+
+
+    .inner-button {
+      position: absolute;
+      transform: translate(-35px, 2px);
+      border: none;
+      background-color: transparent;
+
+
+      z-index: 99999;
+    }
 </style>
-<div class="row justify-content-center">
-        <div class="col-12 d-flex flex-wrap justify-content-end ">
+<div class="row ">
+            <div class="col-9 ">
+                <form  id="searchAddress"  action="/map_search" method="post">
+                    {% csrf_token %}
 
-    <form id="searchAddress"  action="/map_search" method="post">
-                                    {% csrf_token %}
-                                                <input    id="address" type="text"   size="35" name="find_address" value="{{ point.address }}">
-                                    <input type="hidden" name="save_data" value="false">
-        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
-                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F50D;">
-                                </form>
-            <form  id="saveData" action="/map_search" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="save_data" value="false">
-        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
-                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#x1F4BE;">
-                                </form>
-            <form  class="" action="/view_journey" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="save_data" value="false">
-        <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
-                                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="&#9932;">
-                                </form>
-</div>
+                        <input class="col-9 " id="address" type="text"    name="find_address" value="{{ point.address }}">
+                        <button class="inner-button " type="button" onclick="clearSearch()">&#9932;</button>
+                        <input type="submit" class="submit_btn btn col border border-dark butW ps-2" value="&#x1F50D;">
+
+
+                    <input type="hidden" name="save_data" value="false">
+                    <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+
+                </form>
+            </div>
+
+
+            <div class="col-3  d-flex justify-content-end">
+
+                <form  id="saveData" action="/map_search" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="save_data" value="false">
+                    <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                    <input type="submit" class="submit_btn btn border border-dark butW ps-2" value="&#x1F4BE;">
+                </form>
+                <form  class="" action="/view_journey" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="save_data" value="false">
+                    <input type="hidden"  name="journey_id" value="{{ journey.pk }}">
+                    <input type="hidden"  name="point_id" value="{{ p.pk }}">
+                    <input type="submit" class="submit_btn btn  border border-dark butW " value="&#9932;">
+                </form>
+
+
+
+            </div>
+
+
 </div>
 <div class="row justify-content-center">
         <div class="col-12">
 
     <div class="linkholder">
-        <div class="mapholder">
+        <div class="mapholder mx-1 my-3 border border-dark">
             <div id="map"></div>
 
 

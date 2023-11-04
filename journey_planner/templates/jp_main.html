@@ -31,21 +31,21 @@
         <div class="col-12">
 {% for j in journeys %}
             <div class="py-1">
-                <div class="row border border-dark">
+                <div class="row border calendar border-dark">
                     <div class="col-12">
-                        <div class="row d-flex  py-2">
+                        <div class="row d-flex  py-1">
                     <div class="col-1 d-flex align-items-center p-2">
                         <img src="{% static 'balls/globe.png' %}" width="30" height="30">
                     </div>
-
-                    <div class="col ps-3 p-2 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#mainelement{{ j.id }}" aria-expanded="false" aria-controls="mainelement{{ j.id }}">
-                        {{  j.name }}
-                    </div>
-                <div class="col-3 d-flex flex-column p-1 ">
-                    <div>{{ j.start_date|date:"d-m-Y" }}</div>
-                    <div>                        {{ j.end_date|date:"d-m-Y" }}                    </div>
+<div class="col-4 small ps-3 d-flex flex-column p-1 ">
+                    <div>{{ j.start_date|date:"d-M-Y" }}</div>
+                    <div>                        {{ j.end_date|date:"d-M-Y" }}                    </div>
 
                 </div>
+                    <div class="col   d-flex align-items-center" data-bs-toggle="collapse" data-bs-target="#mainelement{{ j.id }}" aria-expanded="false" aria-controls="mainelement{{ j.id }}">
+                        {{  j.name }}
+                    </div>
+
                 <div class="col-3 d-flex flex-wrap justify-content-end align-items-center">
                     <form action="/view_journey" method="post">
                                     {% csrf_token %}
@@ -78,7 +78,7 @@
                                     {% csrf_token %}
                                                 <input class="col" type="text"   name="extra_user">
                                     <input class="col-3" type="hidden"  name="journey_id" value="{{ j.pk }}">
-                                    <input type="submit" class="submit_btn btn col border border-dark" value="Add User">
+                                    <input type="submit" class="submit_btn btn col border default border-dark" value="Add User">
                                 </form>
                     </div>
 
@@ -107,7 +107,7 @@
                 <input type="hidden" name="delete_data" value="false">
     <div  class="d-grid gap-2">
 
-        <input type="submit" class="submit_btn btn border border-dark " value="Create New">
+        <input type="submit" class="submit_btn btn default border border-dark " value="Create New">
 
     </div>
                                      </form>

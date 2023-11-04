@@ -20,18 +20,39 @@
       --white: #ffffff;
       --cream: #eeeedd;
       --black: #000000;
-      --bdrop: #6b5a4e;
-      --bgcolor: #6F5E5C;
-      --calendar: #AFA683;
-      --default: #C6CAEDBB;
+      --bdrop: #65524D;
+      --bgcolor: #FFD8BE;
+      --calendar: #FFEEDD;
+      --default: #C6CAEDFF;
 
 
     }
 
+    .bdrop {
+        background-color: var(--bdrop);
+    }
 
+    .bground {
+        color: var(--black);
+        background-color: var(--bgcolor);
+        border-style: solid;
+        border-width: 1px;
+        border-color: var(--black);
+    }
+
+    .calendar {
+        color: var(--black);
+        background-color: var(--calendar);
+    }
+
+    .default {
+        color: var(--black);
+        background-color: var(--default);
+    }
 
     .butW {
         width: 40px;
+        margin: 0px;
         background-color: var(--default);
 
 
@@ -52,8 +73,8 @@
       border-style: solid;
       border-color: #222222;
       color: #FFFFFF;
-      font-size: 18px;
-      padding: 10px 15px;
+      font-size: 14px;
+      padding: 4px 6px;
       position: relative;
     }
     .point-label::after {
@@ -73,7 +94,7 @@
 <body class="container-sm bdrop">
 {% block body %}
 
-    <nav class="navbar navbar-expand-sm navbar-light border border-dark shadow flex-row default">
+    <nav class="navbar navbar-expand-sm navbar-light border border-dark shadow flex-row default fixed-top">
 
   <div class="container-fluid ">
 
@@ -110,7 +131,7 @@
   </div>
 </nav>
 
-<div class="container bground">
+<div class="container mt-4 pt-5 bground">
     <ol class="breadcumb my-4">
         {% block breadcrumb %}
         {% endblock %}
